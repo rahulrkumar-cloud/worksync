@@ -1,3 +1,17 @@
+"use client"
+import React from "react";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  User,
+} from "@heroui/react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -7,7 +21,7 @@ import {
   NavbarItem,
   NavbarMenuItem,
 } from "@heroui/navbar";
-import { Button } from "@heroui/button";
+import { Button as HeroUIButton } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
@@ -25,6 +39,57 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+
+export const UserTwitterCard = () => {
+  const [isLoggedIn, setisLoggedIn] = React.useState(false);
+
+  return (
+    <Card className="max-w-[300px] border-none bg-transparent" shadow="none">
+      <CardHeader className="justify-between">
+        <div className="flex gap-3">
+          <Avatar
+            isBordered
+            radius="full"
+            size="md"
+            // src="https://i.pravatar.cc/150?u=a04258114e29026702d"
+          />
+          <div className="flex flex-col items-start justify-center">
+            <h4 className="text-small font-semibold leading-none text-default-600">TEST</h4>
+            <h5 className="text-small tracking-tight text-default-500">@test</h5>
+          </div>
+        </div>
+        <Button
+          className={isLoggedIn ? "bg-transparent text-foreground border-default-200" : ""}
+          color="primary"
+          radius="full"
+          size="sm"
+          variant={isLoggedIn ? "bordered" : "solid"}
+          onPress={() => setisLoggedIn(!isLoggedIn)}
+        >
+          {isLoggedIn ? "Login" : "Logout"}
+        </Button>
+      </CardHeader>
+      <CardBody className="px-3 py-0">
+        <p className="text-small pl-px text-default-500">
+          Full-stack developer, @hero_ui lover she/her
+          <span aria-label="confetti" role="img">
+            🎉
+          </span>
+        </p>
+      </CardBody>
+      {/* <CardFooter className="gap-3">
+        <div className="flex gap-1">
+          <p className="font-semibold text-default-600 text-small">4</p>
+          <p className=" text-default-500 text-small">Following</p>
+        </div>
+        <div className="flex gap-1">
+          <p className="font-semibold text-default-600 text-small">97.1K</p>
+          <p className="text-default-500 text-small">Followers</p>
+        </div>
+      </CardFooter> */}
+    </Card>
+  );
+};
 
 export const Navbar = () => {
   const searchInput = (
@@ -54,7 +119,7 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">WORKSYNC</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
@@ -63,7 +128,7 @@ export const Navbar = () => {
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
                 color="foreground"
                 href={item.href}
@@ -104,6 +169,26 @@ export const Navbar = () => {
             Sponsor
           </Button>
         </NavbarItem>
+
+        {/* User Avatar with Popover */}
+        <NavbarItem className="flex items-center gap-3">
+          <Popover showArrow placement="bottom">
+            <PopoverTrigger>
+              <User
+                as="button"
+                // avatarProps={{
+                //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+                // }}
+                className="transition-transform"
+                description="Product Designer"
+                name="TEST"
+              />
+            </PopoverTrigger>
+            <PopoverContent className="p-1">
+              <UserTwitterCard />
+            </PopoverContent>
+          </Popover>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
@@ -124,8 +209,8 @@ export const Navbar = () => {
                   index === 2
                     ? "primary"
                     : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
+                    ? "danger"
+                    : "foreground"
                 }
                 href="#"
                 size="lg"
