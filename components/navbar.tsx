@@ -1,17 +1,5 @@
-"use client"
-import React from "react";
-import {
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  User,
-} from "@heroui/react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -21,52 +9,32 @@ import {
   NavbarItem,
   NavbarMenuItem,
 } from "@heroui/navbar";
-import { Button as HeroUIButton } from "@heroui/button";
+import { Input } from "@heroui/input";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
+import { SearchIcon, Logo, GithubIcon, TwitterIcon, DiscordIcon } from "@/components/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setSearchTerm } from "@/features/search/searchSlice";
 
-export const UserTwitterCard = () => {
-  const [isLoggedIn, setisLoggedIn] = React.useState(false);
-
-  return (
-    <Card className="max-w-[300px] border-none bg-transparent" shadow="none">
-      <CardHeader className="justify-between">
-        <Button
-          className={isLoggedIn ? "bg-transparent text-foreground border-default-200" : ""}
-          color="primary"
-          radius="full"
-          size="sm"
-          variant={isLoggedIn ? "bordered" : "solid"}
-          onPress={() => setisLoggedIn(!isLoggedIn)}
-        >
-          {isLoggedIn ? "Login" : "Logout"}
-        </Button>
-      </CardHeader>
-    </Card>
-  );
-};
-
 export const Navbar = () => {
   const dispatch = useDispatch();
   const searchTerm = useSelector((state: RootState) => state.search.searchTerm);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Handle screen resize to track when mobile
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Run on mount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -93,21 +61,22 @@ export const Navbar = () => {
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+        {/* Brand Logo */}
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
             <p className="font-bold text-inherit">WORKSYNC</p>
           </NextLink>
         </NavbarBrand>
+
+        {/* Desktop Nav Items - Hidden below 1024px */}
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
+                  "text-foreground data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
-                color="foreground"
                 href={item.href}
               >
                 {item.label}
@@ -117,11 +86,53 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
+      {/* Desktop: Show search & icons | Mobile: Show burger menu */}
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="end">
+        {!isMobile ? (
+          <>
+            {/* Desktop: Show social icons & search */}
+            <NavbarItem className="hidden sm:flex gap-2">
+              <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+                <TwitterIcon className="text-default-500" />
+              </Link>
+              <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
+                <DiscordIcon className="text-default-500" />
+              </Link>
+              <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+                <GithubIcon className="text-default-500" />
+              </Link>
+              <ThemeSwitch />
+            </NavbarItem>
+            <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+          </>
+        ) : (
+          <>
+            {/* Mobile: Show ThemeSwitch & Menu Toggle */}
+            <ThemeSwitch />
+            <NavbarMenuToggle />
+          </>
+        )}
+      </NavbarContent>
+
+      {/* Mobile Menu - Controlled by NavbarMenuToggle */}
+      <NavbarMenu>
+        {searchInput}
+        <div className="mx-4 mt-2 flex flex-col gap-2">
+          {siteConfig.navMenuItems.map((item, index) => (
+            <NavbarMenuItem key={item.href}>
+              <Link
+                color={index === 2 ? "primary" : "foreground"}
+                href={item.href}
+                size="lg"
+              >
+                {item.label}
+              </Link>
+            </NavbarMenuItem>
+          ))}
+        </div>
+
+        {/* Social Icons in Mobile Menu */}
+        <div className="mx-4 mt-4 flex gap-3">
           <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />
           </Link>
@@ -131,71 +142,6 @@ export const Navbar = () => {
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
           </Link>
-          <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
-        </NavbarItem>
-
-        {/* User Avatar with Popover */}
-        {/* <NavbarItem className="flex items-center gap-3">
-          <Popover showArrow placement="bottom">
-            <PopoverTrigger>
-              <User
-                as="button"
-                // avatarProps={{
-                //   src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-                // }}
-                className="transition-transform"
-                description="Product Designer"
-                name="TEST"
-              />
-            </PopoverTrigger>
-            <PopoverContent className="p-1">
-              <UserTwitterCard />
-            </PopoverContent>
-          </Popover>
-        </NavbarItem> */}
-      </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link>
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                    ? "danger"
-                    : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
         </div>
       </NavbarMenu>
     </HeroUINavbar>
