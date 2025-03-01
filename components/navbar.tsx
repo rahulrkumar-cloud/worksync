@@ -39,6 +39,9 @@ import {
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { setSearchTerm } from "@/features/search/searchSlice";
 
 export const UserTwitterCard = () => {
   const [isLoggedIn, setisLoggedIn] = React.useState(false);
@@ -46,18 +49,6 @@ export const UserTwitterCard = () => {
   return (
     <Card className="max-w-[300px] border-none bg-transparent" shadow="none">
       <CardHeader className="justify-between">
-        <div className="flex gap-3">
-          <Avatar
-            isBordered
-            radius="full"
-            size="md"
-            // src="https://i.pravatar.cc/150?u=a04258114e29026702d"
-          />
-          <div className="flex flex-col items-start justify-center">
-            <h4 className="text-small font-semibold leading-none text-default-600">TEST</h4>
-            <h5 className="text-small tracking-tight text-default-500">@test</h5>
-          </div>
-        </div>
         <Button
           className={isLoggedIn ? "bg-transparent text-foreground border-default-200" : ""}
           color="primary"
@@ -69,29 +60,13 @@ export const UserTwitterCard = () => {
           {isLoggedIn ? "Login" : "Logout"}
         </Button>
       </CardHeader>
-      <CardBody className="px-3 py-0">
-        <p className="text-small pl-px text-default-500">
-          Full-stack developer, @hero_ui lover she/her
-          <span aria-label="confetti" role="img">
-            🎉
-          </span>
-        </p>
-      </CardBody>
-      {/* <CardFooter className="gap-3">
-        <div className="flex gap-1">
-          <p className="font-semibold text-default-600 text-small">4</p>
-          <p className=" text-default-500 text-small">Following</p>
-        </div>
-        <div className="flex gap-1">
-          <p className="font-semibold text-default-600 text-small">97.1K</p>
-          <p className="text-default-500 text-small">Followers</p>
-        </div>
-      </CardFooter> */}
     </Card>
   );
 };
 
 export const Navbar = () => {
+  const dispatch = useDispatch();
+  const searchTerm = useSelector((state: RootState) => state.search.searchTerm);
   const searchInput = (
     <Input
       aria-label="Search"
@@ -110,6 +85,8 @@ export const Navbar = () => {
         <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
       }
       type="search"
+      value={searchTerm}
+      onChange={(e) => dispatch(setSearchTerm(e.target.value))}
     />
   );
 
@@ -171,7 +148,7 @@ export const Navbar = () => {
         </NavbarItem>
 
         {/* User Avatar with Popover */}
-        <NavbarItem className="flex items-center gap-3">
+        {/* <NavbarItem className="flex items-center gap-3">
           <Popover showArrow placement="bottom">
             <PopoverTrigger>
               <User
@@ -188,7 +165,7 @@ export const Navbar = () => {
               <UserTwitterCard />
             </PopoverContent>
           </Popover>
-        </NavbarItem>
+        </NavbarItem> */}
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
