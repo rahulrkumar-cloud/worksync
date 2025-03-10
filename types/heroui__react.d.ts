@@ -10,6 +10,7 @@ declare module '@heroui/react' {
     export const PopoverTrigger: any;
     export const PopoverContent: any;
     export const User: any;
+    export const Progress: any;
     // Add any other components from @heroui/react that you are using
   }
   
