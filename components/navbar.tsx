@@ -1,149 +1,139 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from "@heroui/navbar";
-import { Input } from "@heroui/input";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import NextLink from "next/link";
-import clsx from "clsx";
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
+import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import {GetUserData} from '@/app/helper/userdata';
+import { Button } from '@heroui/react';
+import { useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux';
+import { logout } from '@/features/search/searchSlice';
+import Link from 'next/link';
 
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { SearchIcon, Logo, GithubIcon, TwitterIcon, DiscordIcon } from "@/components/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { setSearchTerm } from "@/features/search/searchSlice";
+import { redirect } from 'next/navigation'
+import Cookies from 'js-cookie';
+const navigation = [
+  { name: 'Dashboard', href: '/', current: true },
+  { name: 'Team', href: '/blog', current: false },
+  { name: 'Projects', href: '#', current: false },
+  { name: 'Calendar', href: '#', current: false },
+]
 
-export const Navbar = () => {
-  const dispatch = useDispatch();
-  const searchTerm = useSelector((state: RootState) => state.search.searchTerm);
-  const [isMobile, setIsMobile] = useState(false);
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}
 
-  // Handle screen resize to track when mobile
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Run on mount
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+export function Navbar() {
+ const userDataFinal= GetUserData();
+ const router = useRouter();
+ const dispatch = useDispatch();
+ 
+ function handleLogout() {
+  // Dispatch action to save user in Redux (if using Redux)
+  if (userDataFinal?.isLoggedIn) {
+    localStorage.clear();
+    Cookies.remove("isLoggedIn");
+     dispatch(logout());
+     // Use router.push for client-side navigation (prevents reload)
+     router.push('/');
+  } else {
+     // If user is not logged in, navigate to the homepage
+     router.push('/');
+  }
+}
 
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-      value={searchTerm}
-      onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-    />
-  );
+function onClickLink(path:string){
+  router.push('/`${path}`');
+}
+console.log("userDataFinal",userDataFinal)
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        {/* Brand Logo */}
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">WORKSYNC</p>
-          </NextLink>
-        </NavbarBrand>
-
-        {/* Desktop Nav Items - Hidden below 1024px */}
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  "text-foreground data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
-
-      {/* Desktop: Show search & icons | Mobile: Show burger menu */}
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="end">
-        {!isMobile ? (
-          <>
-            {/* Desktop: Show social icons & search */}
-            <NavbarItem className="hidden sm:flex gap-2">
-              <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-                <TwitterIcon className="text-default-500" />
-              </Link>
-              <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-                <DiscordIcon className="text-default-500" />
-              </Link>
-              <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-                <GithubIcon className="text-default-500" />
-              </Link>
-              <ThemeSwitch />
-            </NavbarItem>
-            <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-          </>
-        ) : (
-          <>
-            {/* Mobile: Show ThemeSwitch & Menu Toggle */}
-            <ThemeSwitch />
-            <NavbarMenuToggle />
-          </>
-        )}
-      </NavbarContent>
-
-      {/* Mobile Menu - Controlled by NavbarMenuToggle */}
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={item.href}>
+    <Disclosure as="nav" className="bg-gray-800 w-full">
+    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 w-full">
+      <div className="relative flex h-16 items-center justify-between w-full">
+        
+        {/* Left Section - Logo */}
+        <div className="flex items-center">
+          <img
+            alt="Your Company"
+            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+            className="h-8 w-auto"
+          />
+        </div>
+  
+        {/* Center Section - Navigation */}
+        <div className="hidden sm:flex flex-1 justify-center">
+          <div className="flex space-x-4">
+            {navigation.map((item) => (
               <Link
-                color={index === 2 ? "primary" : "foreground"}
+                key={item.name}
                 href={item.href}
-                size="lg"
+                aria-current={item.current ? 'page' : undefined}
+                className={classNames(
+                  item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                  'rounded-md px-3 py-2 text-sm font-medium'
+                )}
               >
-                {item.label}
+                {item.name}
               </Link>
-            </NavbarMenuItem>
-          ))}
+            ))}
+          </div>
         </div>
-
-        {/* Social Icons in Mobile Menu */}
-        <div className="mx-4 mt-4 flex gap-3">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-            <DiscordIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-            <GithubIcon className="text-default-500" />
-          </Link>
+  
+        {/* Right Section - Profile & Notifications */}
+        <div className="flex items-center space-x-4">
+          {/* Notifications Icon */}
+          <button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white">
+            <BellIcon aria-hidden="true" className="h-6 w-6" />
+          </button>
+  
+          {/* Profile Dropdown */}
+          <Menu as="div" className="relative">
+            <div>
+              <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white">
+                <img
+                  alt="User Avatar"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  className="h-8 w-8 rounded-full"
+                />
+              </MenuButton>
+            </div>
+            <MenuItems className="absolute right-0 z-10 mt-2 w-48 bg-white py-1 shadow-lg ring-1 ring-black/5">
+              <MenuItem>
+                <p className="block px-4 py-2 text-sm text-gray-700">{userDataFinal?.isLoggedIn ? `Hello, ${userDataFinal?.user?.name}` : "Please login"}</p>
+              </MenuItem>
+              <MenuItem>
+                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+              </MenuItem>
+              <MenuItem>
+                <Button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600" onClick={handleLogout}>
+                  {userDataFinal?.isLoggedIn ? "Logout" : "Login"}
+                </Button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
         </div>
-      </NavbarMenu>
-    </HeroUINavbar>
-  );
-};
+      </div>
+    </div>
+  
+    {/* Mobile Menu */}
+    <DisclosurePanel className="sm:hidden">
+      <div className="space-y-1 px-2 pt-2 pb-3">
+        {navigation.map((item) => (
+          <DisclosureButton
+            key={item.name}
+            as="a"
+            href={item.href}
+            className={classNames(
+              item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+              'block rounded-md px-3 py-2 text-base font-medium',
+            )}
+          >
+            {item.name}
+          </DisclosureButton>
+        ))}
+      </div>
+    </DisclosurePanel>
+  </Disclosure>
+  
+  )
+}
