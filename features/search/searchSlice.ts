@@ -4,17 +4,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface SearchState {
   searchTerm: string;
   isLoggedIn: boolean;
-  user: any | null;  // Store the user object (or null if not logged in)
-  token: string | null;  // Store the token (or null if not logged in)
-  userData:[]
+  user: any | null; // Store the user object (or null if not logged in)
+  token: string | null; // Store the token (or null if not logged in)
+  userData: [];
 }
 
 const initialState: SearchState = {
-  isLoggedIn: false,   // Set initial login state to false
-  searchTerm: "",      // No search term initially
-  user: null,          // User is not logged in by default
-  token: null,         // No token by default
-  userData:[]
+  isLoggedIn: false, // Set initial login state to false
+  searchTerm: "", // No search term initially
+  user: null, // User is not logged in by default
+  token: null, // No token by default
+  userData: [],
 };
 
 const searchSlice = createSlice({
@@ -26,7 +26,10 @@ const searchSlice = createSlice({
       state.searchTerm = action.payload;
     },
     // Action to handle login success (store user data and token)
-    loginSuccess: (state, action: PayloadAction<{ user: any; token: string }>) => {
+    loginSuccess: (
+      state,
+      action: PayloadAction<{ user: any; token: string }>,
+    ) => {
       console.log("tokentoken", action.payload.user);
       state.isLoggedIn = true;
       state.user = action.payload.user;
