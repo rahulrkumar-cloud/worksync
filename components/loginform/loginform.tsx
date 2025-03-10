@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { loginSuccess } from "@/features/search/searchSlice";
 import { Button } from "@heroui/react";
 import Cookies from "js-cookie";
+
+import { loginSuccess } from "@/features/search/searchSlice";
 
 export default function LogInForm() {
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ export default function LogInForm() {
       });
 
       const data = await response.json();
+
       if (!response.ok) throw new Error(data.message || "Login failed");
 
       localStorage.setItem("token", data.token);
@@ -46,76 +48,97 @@ export default function LogInForm() {
       <div className="bg-white shadow-2xl p-8 rounded-xl w-full max-w-md border border-gray-200">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/logo.svg" alt="Logo" className="h-12" />
+          <img alt="Logo" className="h-12" src="/logo.svg" />
         </div>
 
         {/* Heading */}
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
           Sign in to your account
         </h2>
-        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+        )}
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form className="space-y-5" onSubmit={handleLogin}>
           <div>
-            <label className="block text-gray-700 text-sm font-medium">Email</label>
+            <label className="block text-gray-700 text-sm font-medium">
+              Email
+              <input
+                className="mt-1 p-2 border rounded w-full"
+                name="email"
+                type="email"
+              />
+            </label>
+
             <input
-              type="email"
+              required
               className="w-full px-4 py-3 mt-1 rounded-lg bg-gray-100 text-gray-800 placeholder-gray-400 border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none"
+              placeholder="Enter your email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-medium">Password</label>
+            <label className="block text-gray-700 text-sm font-medium">
+              Password
+              <input
+                className="mt-1 p-2 border rounded w-full"
+                name="password"
+                type="password"
+              />
+            </label>
+
             <input
-              type="password"
+              required
               className="w-full px-4 py-3 mt-1 rounded-lg bg-gray-100 text-gray-800 placeholder-gray-400 border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none"
+              placeholder="Enter your password"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
             />
           </div>
 
           {/* Forgot Password */}
           <div className="text-right">
-            <a href="/forgot-password" className="text-blue-500 hover:underline text-sm">
+            <a
+              className="text-blue-500 hover:underline text-sm"
+              href="/forgot-password"
+            >
               Forgot Password?
             </a>
           </div>
 
           {/* Sign In Button */}
           <Button
-            type="submit"
             className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-300"
+            type="submit"
           >
             Sign In
           </Button>
 
           {/* OR Divider */}
           <div className="flex items-center justify-center gap-2 my-3">
-            <span className="h-px w-full bg-gray-300"></span>
+            <span className="h-px w-full bg-gray-300" />
             <span className="text-gray-600 text-sm">OR</span>
-            <span className="h-px w-full bg-gray-300"></span>
+            <span className="h-px w-full bg-gray-300" />
           </div>
 
           {/* Google Login Button */}
           <button
-            type="button"
             className="w-full flex items-center justify-center gap-3 py-3 bg-white text-gray-800 font-bold rounded-lg shadow-md border border-gray-300 hover:bg-gray-100 transition-all duration-300"
+            type="button"
           >
-            <img src="/google.svg" alt="Google" className="h-5 w-5" />
+            <img alt="Google" className="h-5 w-5" src="/google.svg" />
             Continue with Google
           </button>
 
           {/* Signup Redirect */}
           <p className="text-center text-gray-600 text-sm mt-3">
-            Don't have an account?{" "}
-            <a href="/register" className="text-blue-500 hover:underline">
+            Don&lsquo;t have an account?{" "}
+            <a className="text-blue-500 hover:underline" href="/register">
               Sign up
             </a>
           </p>
